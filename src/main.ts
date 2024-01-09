@@ -1,20 +1,15 @@
 import 'reflect-metadata';
-import { Container } from 'inversify';
-import {Application} from './app/rest/app.js';
-import {Component} from './types/component.type.js';
+import {Component} from './types/component.enum.js';
+import Application from './app/application.js';
+import {Container} from 'inversify';
+import {createUserContainer} from './modules/user/user.container.js';
+import {createApplicationContainer} from './app/api.container.js';
+import {createOfferContainer} from './modules/offer/offer.container.js';
+import {createCommentContainer} from './modules/comments/comment.container.js';
 
-import {createUserContainer} from "./modules/users/container";
-import {createApplicationContainer} from "./app/rest/api.container";
-import {createOfferContainer} from "./modules/offers/container";
-
-
-async function bootstrap() {
-  const mainContainer = Container.merge(createApplicationContainer(),
-    createUserContainer(),
-    createOfferContainer());
-  const application = mainContainer.get<Application>(Component.Application);
-  await application.init();
-
-}
-
-bootstrap();
+const mainContainer = Container.merge(createApplicationContainer(),
+  createUserContainer(),
+  createOfferContainer(),
+  createCommentContainer());
+const application = mainContainer.get<Application>(Component.Application);
+await application.init();

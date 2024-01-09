@@ -11,50 +11,77 @@ export type ConfigSchema = {
   DB_PASSWORD: string;
   DB_PORT: string;
   DB_NAME: string;
+  UPLOAD_DIRECTORY: string;
+  JWT_SECRET: string;
+  HOST: string;
+  STATIC_DIRECTORY_PATH: string;
 }
 
 export const configSchema = convict<ConfigSchema>({
   PORT: {
-    doc: 'database port',
+    doc: 'Application port for connections',
     format: 'port',
     env: 'PORT',
-    default: 4000
+    default: 4055
   },
   SALT: {
-    doc: 'salt for password hash',
+    doc: 'Salt for password hash',
     format: String,
     env: 'SALT',
     default: null
   },
   DB_HOST: {
-    doc: 'database IP address',
+    doc: 'Database host for connection',
     format: 'ipaddress',
     env: 'DB_HOST',
     default: '127.0.0.1'
   },
   DB_USER: {
-    doc: 'database username',
+    doc: 'Database user for connection',
     format: String,
     env: 'DB_USER',
     default: null,
   },
   DB_PASSWORD: {
-    doc: 'database password',
+    doc: 'Database password for connection',
     format: String,
     env: 'DB_PASSWORD',
     default: null,
   },
   DB_PORT: {
-    doc: 'database port',
+    doc: 'Database port for connection',
     format: 'port',
     env: 'DB_PORT',
     default: '27017',
   },
   DB_NAME: {
-    doc: 'database name',
+    doc: 'Database name for connection',
     format: String,
     env: 'DB_NAME',
     default: 'buy-and-sell'
-  }
-
+  },
+  UPLOAD_DIRECTORY: {
+    doc: 'Directory for upload files',
+    format: String,
+    env: 'UPLOAD_DIRECTORY',
+    default: null
+  },
+  JWT_SECRET: {
+    doc: 'Secret for sign JWT',
+    format: String,
+    env: 'JWT_SECRET',
+    default: null
+  },
+  HOST: {
+    doc: 'Host where started service',
+    format: String,
+    env: 'HOST',
+    default: 'localhost'
+  },
+  STATIC_DIRECTORY_PATH: {
+    doc: 'Path to directory with static resources',
+    format: String,
+    env: 'STATIC_DIRECTORY_PATH',
+    default: 'static'
+  },
 });

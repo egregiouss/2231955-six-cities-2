@@ -1,0 +1,34 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`POST /offers > Success offers create 1`] = `
+{
+  "city": "Amsterdam",
+  "commentsCount": 0,
+  "coordinates": {
+    "latitude": 2.22222,
+    "longitude": 3.444444,
+  },
+  "cost": 10000,
+  "description": "descriptiontwentylenght",
+  "facilities": [
+    "AirConditioning",
+  ],
+  "guestCount": 3,
+  "housingType": "House",
+  "id": 0,
+  "images": "http://localhost:4000/upload/",
+  "name": "nametenlenght",
+  "offerAuthor": {
+    "avatar": "http://localhost:4000/static/default-avatar.jpg",
+    "email": "test@test.com",
+    "id": 0,
+    "type": "simple",
+    "username": "name",
+  },
+  "premium": true,
+  "previewImage": "http://localhost:4000/upload/",
+  "publicationDate": 23.01,
+  "rating": 1,
+  "roomCount": 2,
+}
+`;

@@ -1,0 +1,728 @@
+openapi: 3.1.0
+info:
+  title: API сервер для проекта «Шесть городов».
+  description: |-
+    * Список ресурсов и маршрутов сервера «Шесть городов».
+    * «Шесть городов» — сервис для путешественников, не желающих переплачивать за аренду жилья. Выбирайте один из шести популярных городов для путешествий и получайте актуальный список предложений по аренде.
+  license:
+    name: MIT
+    url: https://opensource.org/licenses/MIT
+  version: 2.0.0
+tags:
+  - name: users
+    description: Действия с пользователями.
+  - name: offers
+    description: Действия с объявлениями.
+  - name: comments
+    description: Действия с комментариями.
+
+paths:
+  /users/register:
+    post:
+      tags:
+        - users
+      summary: Регистрация пользователя
+      description: Регистрирует нового пользователя.
+
+      requestBody:
+        description: Информация для создания нового пользователя.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/createUserDto'
+        required: true
+
+      responses:
+        "201":
+          description: Пользователь зарегистрирован.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/userRdo'
+        "409":
+          description: Пользователь с таким email уже существует.
+
+  /users/login:
+    post:
+      tags:
+        - users
+      summary: Авторизация пользователя
+      description: Авторизует пользователя на основе логина и пароля
+      requestBody:
+        description: Вход в закрытую часть приложения.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/loginUser'
+        required: true
+      responses:
+        "200":
+          description: Пользователь авторизован.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/loginUserRdo'
+        "401":
+          description: Авторизация не пройдена
+    get:
+      tags:
+        - users
+      summary: Проверка состояния пользователя
+      description: Возвращает информацию по авторизованному пользователю
+      security:
+        - Bearer: [ ]
+      responses:
+        "200":
+          description: Пользователь авторизован
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/loginUserRdo'
+        "401":
+          description: Пользователь не авторизован
+
+  /users/logout:
+    post:
+      tags:
+        - users
+      summary: Выход из закрытой части приложения
+      description: Выход из закрытой части приложения
+      responses:
+        "204":
+          description: Пользователь вышел
+        "401":
+          description: Пользователь не авторизован
+
+  /offers/users/favorites:
+    get:
+      tags:
+        - offers
+      summary: Список избранных предложений
+      description: Возвращает массив предложений, добавленных в избранное.
+      security:
+        - Bearer: [ ]
+      responses:
+        "200":
+          description: Список избранных предложений
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/shortOffers'
+        "401":
+          description: Пользователь не авторизован
+
+  /offers/favorites/{offerId}:
+    post:
+      tags:
+        - offers
+      summary: Добавление предложения в избранное.
+      description: Добавление предложения в избранное.
+      security:
+        - Bearer: [ ]
+      responses:
+        "204":
+          description: Предложение добавлено в избранное
+        "400":
+          description: Передан неверный offerId
+        "404":
+          description: Предложение с offerId не найдено
+        "401":
+          description: Пользователь не авторизован
+  delete:
+    tags:
+      - offers
+    summary: Удаление предложения из избранного.
+    description: Удаление предложения из избранногое.
+    security:
+      - Bearer: [ ]
+
+    responses:
+      "204":
+        description: Предложение удалено из избранного
+      "400":
+        description: Передан неверный offerId
+      "404":
+        description: Предложение с offerId не найдено
+      "401":
+        description: Пользователь не авторизован
+
+  /offers/premium/{city}:
+    get:
+      tags:
+        - offers
+      summary: Премиальные предложения для города
+      description: Возвращает не больше 3 предложений с флагом «Premium».
+      responses:
+        "200":
+          description: Премиальные предложения для города
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/shortOffers'
+
+
+  /offers/{offerId}:
+    patch:
+      tags:
+        - offers
+      summary: Редактирование предложения
+      description: Редактирование предложения
+      security:
+        - Bearer: [ ]
+      requestBody:
+        description: Данные для редактирования предложения.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/editOfferDto'
+        required: true
+      responses:
+        "200":
+          description: Предложение изменено
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/offerRdo'
+        "400":
+          description: Передан неверный offerId
+        "401":
+          description: Пользователь не авторизован
+        "404":
+          description: Предложение с offerId не найдено
+
+    delete:
+      tags:
+        - offers
+      summary: Удаление предложения
+      description: Удаление предложения
+      security:
+        - Bearer: [ ]
+      responses:
+        "204":
+          description: Предложение удалено
+        "404":
+          description: Предложение с offerId не найдено
+        "401":
+          description: Пользователь не авторизован
+        "400":
+          description: Передан неверный offerId
+
+    get:
+      tags:
+        - offers
+      summary: Детальная информация по предложению
+      description: Детальная информация по предложению
+
+      responses:
+        "200":
+          description: Детальная информация по предложению
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/offerRdo'
+        "404":
+          description: Предложение с offerId не найдено
+        "400":
+          description: Передан неверный offerId
+
+  /offers:
+    get:
+      tags:
+        - offers
+      summary: Список предложений по аренде
+      description: Список предложений по аренде
+      parameters:
+        - name: count
+          in: query
+          description: Кол-во предложений
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  count:
+                    type: number
+                    example: 120
+      responses:
+        "200":
+          description: Список предложений по аренде
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/shortOffers'
+    post:
+      tags:
+        - offers
+      summary: Создание нового предложения
+      description: Создание нового предложения
+      security:
+        - Bearer: [ ]
+      requestBody:
+        description: Данные для создания предложения.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/editOfferDto'
+        required: true
+      responses:
+        "201":
+          description: Предложение создано
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/offerRdo'
+        "400":
+          description: Предложение не создано. Переданы невалидные данные
+        "401":
+          description: Пользователь не авторизован
+
+  /comments/{offerId}:
+    get:
+      tags:
+        - comments
+      summary: Список комментариев для предложения
+      description: Список комментариев для предложения
+
+      responses:
+        "200":
+          description: Список комментариев для предложения успешно получен
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/comments'
+        "404":
+          description: Не удалось найти предложение по offerId
+
+    post:
+      tags:
+        - comments
+      summary: Добавление комментария
+      description: Добавление комментария
+      security:
+        - Bearer: [ ]
+      requestBody:
+        description: Добавление комментария
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/commentCreateDto'
+        required: true
+      responses:
+        "201":
+          description: Комментарий успешно добавлен
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/commentRdo'
+        "404":
+          description: Не удалось найти предложение по offerId
+        "400":
+          description: Передан не верный offerId
+        "401":
+          description: Пользователь не авторизован
+
+
+components:
+  securitySchemes:
+    Bearer:
+      type: http
+      scheme: bearer
+      in: header
+      description: Токен для проверки авторизации
+
+  schemas:
+    createUserDto:
+      type: object
+
+      properties:
+        username:
+          type: string
+          example: name
+
+        email:
+          type: string
+          example: keks@htmlacademy.ru
+
+        type:
+          type: string
+          enum: [ simple, pro ]
+          example: simple
+
+        password:
+          type: string
+          example: 123456
+
+    userRdo:
+      type: object
+
+      properties:
+        id:
+          type: string
+          example: 6561de8ae30bb40f4f957092
+
+        username:
+          type: string
+          example: name
+
+        email:
+          type: string
+          example: keks@htmlacademy.ru
+
+        avatar:
+          type: string
+          example: avatar.jpg
+
+        type:
+          type: string
+          enum: [ simple, pro ]
+          example: simple
+
+
+    user:
+      type: object
+
+      properties:
+        id:
+          type: string
+          example: 6329c3d6a04ab1061c6425ea
+
+        userType:
+          type: string
+          enum: [ simple, pro ]
+          example: simple
+
+        email:
+          type: string
+          example: keks@htmlacademy.ru
+
+        username:
+          type: string
+          example: name
+
+        avatar:
+          type: string
+          example: avatar.jpg
+
+    loginUser:
+      type: object
+
+      properties:
+        email:
+          type: string
+          example: keks@htmlacademy.ru
+
+        password:
+          type: string
+          example: 123456
+
+    loginUserRdo:
+      type: object
+
+      properties:
+        email:
+          type: string
+          example: keks@htmlacademy.ru
+
+        token:
+          type: string
+          example: Bearer eyJhbGciOiJIUzI1NiJ9.eyJlbWFpbCI6InByZXZpZXdJbWFnZTNAbWFpbC5ydSIsImlkIjoiNjU3NDQwZWRhM2ZiZWE4YmI1OTEwZGE5IiwiaWF0IjoxNzAyMTE3NjI0LCJleHAiOjE3MDIyOTA0MjR9.0eHiNdLKHuGoD1ldUOFTWkB5Dp8eBwL_HHeic2e5cBk
+
+    offerRdo:
+      type: object
+      properties:
+        id:
+          type: string
+          example: 6329c3d6a04ab1061c6425ea
+        name:
+          type: string
+          example: Квартира
+          minLength: 10
+          maxLength: 100
+
+        description:
+          type: string
+          example: Описание
+          minLength: 20
+          maxLength: 1024
+
+        publicationDate:
+          type: string
+          example: 2023-11-01T00:00:00Z
+
+        city:
+          type: string
+          enum: [ Paris, Cologne, Brussels, Amsterdam, Hamburg, Dusseldorf ]
+          example: Paris
+
+        previewImage:
+          type: string
+          example: offer.jpg
+
+        images:
+          type: array
+          items:
+            type: string
+            example: offer.jpg
+          minItems: 6
+          maxItems: 6
+
+        premium:
+          type: boolean
+          example: true
+
+        favorite:
+          type: boolean
+          example: false
+
+        rating:
+          type: number
+          format: float
+          example: 2.5
+          minimum: 1
+          maximum: 5
+
+        housingType:
+          type: string
+          enum: [ Apartment, House, Room, Hotel ]
+          example: apartment
+
+        roomCount:
+          type: integer
+          example: 4
+          minimum: 1
+          maximum: 8
+
+        guestCount:
+          type: integer
+          example: 3
+          minimum: 1
+          maximum: 10
+
+        cost:
+          type: number
+          example: 50600
+          minimum: 100
+          maximum: 100000
+
+        facilities:
+          type: array
+          items:
+            type: string
+            enum: [ Breakfast, Air conditioning, Laptop friendly workspace, Baby seat, Washer, Towels, Fridge ]
+            example: Breakfast, Laptop
+          minItems: 1
+
+        offerAuthor:
+          $ref: '#/components/schemas/user'
+
+        commentsCount:
+          type: number
+          example: 10
+
+        coordinates:
+          $ref: '#/components/schemas/coordinates'
+
+    offerShortRdo:
+      type: object
+      properties:
+        id:
+          type: string
+          example: 6561de8ae30bb40f4f957092
+
+        name:
+          type: string
+          example: Квартира
+          minLength: 10
+          maxLength: 100
+
+        publicationDate:
+          type: string
+          example: 2023-11-01T00:00:00Z
+
+        description:
+          type: string
+          example: Описание
+          minLength: 20
+          maxLength: 1024
+
+        city:
+          type: string
+          enum: [ Paris, Cologne, Brussels, Amsterdam, Hamburg, Dusseldorf ]
+          example: Paris
+
+        previewImage:
+          type: string
+          example: offer.jpg
+
+        premium:
+          type: boolean
+          example: true
+
+        favorite:
+          type: boolean
+          example: true
+
+        rating:
+          type: number
+          format: float
+          example: 2.5
+          minimum: 1
+          maximum: 5
+
+        housingType:
+          type: string
+          enum: [ Apartment, House, Room, Hotel ]
+          example: apartment
+
+        cost:
+          type: number
+          example: 50600
+          minimum: 100
+          maximum: 100000
+
+        commentsCount:
+          type: number
+          example: 10
+
+    editOfferDto:
+      type: object
+      properties:
+        name:
+          type: string
+          example: Квартира
+          minLength: 10
+          maxLength: 100
+
+        description:
+          type: string
+          example: Описание
+          minLength: 20
+          maxLength: 1024
+
+        city:
+          type: string
+          enum: [ Paris, Cologne, Brussels, Amsterdam, Hamburg, Dusseldorf ]
+          example: Paris
+
+        previewImage:
+          type: string
+          example: offer.jpg
+
+        images:
+          type: array
+          items:
+            type: string
+            example: [ offer.jpg, offer_room.jpg ]
+          minItems: 6
+          maxItems: 6
+
+        premium:
+          type: boolean
+          example: true
+
+        housingType:
+          type: string
+          enum: [ Apartment, House, Room, Hotel ]
+          example: apartment
+
+        roomCount:
+          type: integer
+          example: 4
+          minimum: 1
+          maximum: 8
+
+        guestCount:
+          type: integer
+          example: 3
+          minimum: 1
+          maximum: 10
+
+        cost:
+          type: number
+          example: 50600
+          minimum: 100
+          maximum: 100000
+
+        facilities:
+          type: array
+          items:
+            type: string
+            enum: [ Breakfast, Air conditioning, Laptop friendly workspace, Baby seat, Washer, Towels, Fridge ]
+            example: [ Breakfast, Laptop ]
+          minItems: 1
+
+        coordinates:
+          $ref: '#/components/schemas/coordinates'
+
+    offers:
+      type: array
+      items:
+        type: offer
+        $ref: '#/components/schemas/offerRdo'
+
+    shortOffers:
+      type: array
+      items:
+        type: offer
+        $ref: '#/components/schemas/offerShortRdo'
+
+    comments:
+      type: array
+      items:
+        type: offer
+        $ref: '#/components/schemas/commentRdo'
+
+    coordinates:
+      type: object
+
+      properties:
+        latitude:
+          type: float
+          example: 22.2233455
+
+        longitude:
+          type: float
+          example: 1.33345445
+
+
+    commentRdo:
+      type: object
+      properties:
+        text:
+          type: string
+          example: Очень хорошее предложение
+          minLength: 5
+          maxLength: 1024
+
+        publicationDate:
+          type: string
+          example: 2023-11-01T00:00:00Z
+
+        rating:
+          type: number
+          example: 5
+          minimum: 1
+          maximum: 5
+        user:
+          $ref: '#/components/schemas/user'
+
+    commentCreateDto:
+      type: object
+      properties:
+        text:
+          type: string
+          example: Очень хорошее предложение
+          minLength: 5
+          maxLength: 1024
+
+        rating:
+          type: number
+          example: 5
+          minimum: 1
+          maximum: 5
+
+        user:
+          $ref: '#/components/schemas/user'
+
+
+

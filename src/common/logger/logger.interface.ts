@@ -4,4 +4,3 @@ export interface LoggerInterface {
   error(message: string, ...args: unknown[]): void;
   debug(message: string, ...args: unknown[]): void;
 }
-
